@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -34,4 +35,8 @@ public class TimeEntryEntity {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant created_at;
+
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    private Instant updatedAt;
 }
