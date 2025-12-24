@@ -4,16 +4,16 @@ services:
     container_name: ponto-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: batponto
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       TZ: America/Sao_Paulo
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5433:5432"
     volumes:
       - ponto_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 3s
       retries: 10
