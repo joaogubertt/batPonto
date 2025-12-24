@@ -31,7 +31,7 @@ public class TimeEntryController {
 
     @GetMapping("/user/{userId}/filter")
     public ResponseEntity<List<TimeEntryResponseDto>> listByUserPerPeriod(
-            @PathVariable UUID userId,
+            @PathVariable("userId") UUID userId,
             @RequestParam("from") LocalDate from,
             @RequestParam("to") LocalDate to
     ){
