@@ -34,6 +34,6 @@ public class UserEntity {
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     private Instant updatedAt;
 }
