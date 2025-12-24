@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeEntrieEntity {
+public class TimeEntryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,7 +22,7 @@ public class TimeEntrieEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Column(nullable = false, name = "entry_type")
     private String entryType; // Fazer com Enum tb
