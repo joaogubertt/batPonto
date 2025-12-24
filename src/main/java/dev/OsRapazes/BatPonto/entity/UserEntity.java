@@ -30,9 +30,10 @@ public class UserEntity {
     private String role; // -> Transformar em ENUM
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(updatable = false, name = "created_at")
     private Instant createdAt;
 
     @UpdateTimestamp
+    @Column(name = "update_at")
     private Instant updatedAt;
 }
