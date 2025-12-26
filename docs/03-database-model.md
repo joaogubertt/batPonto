@@ -7,6 +7,7 @@
 - password_hash (varchar, not null)
 - role (varchar, not null) // FUNCIONARIO ou RH
 - created_at (timestamp, not null)
+- updated_at (timestamp, not null)
 
 Índices:
 - unique(email)
@@ -15,8 +16,9 @@
 - id (UUID, PK)
 - user_id (UUID, FK -> users.id, not null)
 - entry_type (varchar, not null) // ENTRADA ou SAIDA
-- timestamp (timestamp, not null) // horário do servidor
+- entry_at (timestamp, not null) // horário do servidor
 - created_at (timestamp, not null)
+- updated_at (timestamp, not null)
 
 Índices:
 - (user_id, timestamp)
