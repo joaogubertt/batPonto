@@ -17,6 +17,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  flyway:
+    image: flyway/flyway:11
+    container_name: ponto-flyway
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    volumes:
+      - ./src/db/migration:/flyway/sql
+      - ./src/db:/flyway/conf
+    command: >
+      -configFiles=/flyway/conf/flyway.conf
+      -connectRetries=60
+      migrate
+    restart: "no"
 
 volumes:
   ponto_pgdata:
