@@ -25,12 +25,12 @@ public class TimeEntryController {
     public final TimeEntryService timeEntryService;
 
     @PostMapping
-    public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto data){
-        TimeEntryResponseDto response = timeEntryService.registerEntry(data);
+    public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto dto){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        TimeEntryResponseDto response = timeEntryService.registerEntry(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    @GetMapping("/api/user/{userId}/filter")
+    @GetMapping("/user/{userId}/filter")
     public ResponseEntity<List<TimeEntryResponseDto>> listByUserPerPeriod(
             @PathVariable("userId") UUID userId,
             @RequestParam("from") LocalDate from,

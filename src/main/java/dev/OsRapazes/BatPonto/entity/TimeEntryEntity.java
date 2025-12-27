@@ -1,5 +1,6 @@
 package dev.OsRapazes.BatPonto.entity;
 
+import dev.OsRapazes.BatPonto.entity.enums.EntryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,10 +26,10 @@ public class TimeEntryEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(nullable = false, name = "entry_type")
-    private String entryType; // Fazer com Enum tb
+    @Enumerated(EnumType.STRING)
+    @Column(name = "entry_type", nullable = false)
+    private EntryType entryType;
 
-    @CreationTimestamp
     @Column(name = "entry_at", nullable = false)
     private Instant entryAt;
 
