@@ -5,6 +5,7 @@ import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
 import dev.OsRapazes.BatPonto.entity.TimeEntryEntity;
 import dev.OsRapazes.BatPonto.entity.UserEntity;
 import dev.OsRapazes.BatPonto.entity.enums.EntryType;
+import dev.OsRapazes.BatPonto.entity.enums.Role;
 import dev.OsRapazes.BatPonto.exception.BusinessException;
 import dev.OsRapazes.BatPonto.repository.TimeEntryRepository;
 import dev.OsRapazes.BatPonto.repository.UserRepository;
@@ -27,6 +28,13 @@ public class TimeEntryService {
         UserEntity user = userRepository.findByEmail(authenticatedEmail.toLowerCase())
                 .orElseThrow(() -> BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
 
+        if (user.getRole() != Role.FUNCIONARIO) {
+            throw BusinessException.unprocessable(
+                    "ROLE_NOT_ALLOWED",
+                    "Somente funcionários podem registrar ponto"
+            );
+        }
+
         EntryType newType = EntryType.valueOf(dto.entryType().toUpperCase());
 
         TimeEntryEntity lastEntry = timeEntryRepository
@@ -39,8 +47,6 @@ public class TimeEntryService {
                     "O primeiro registro deve ser ENTRADA"
             );
         }
-
-        System.out.println("TIPO DE ENTRADA DO ÚLTIMO REGISTRO: " + (lastEntry != null ? lastEntry.getEntryType() : "NULO"));
 
         if (lastEntry != null && lastEntry.getEntryType() == newType) {
             throw BusinessException.unprocessable(
