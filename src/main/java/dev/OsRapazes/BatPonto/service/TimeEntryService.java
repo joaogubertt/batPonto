@@ -1,6 +1,7 @@
 package dev.OsRapazes.BatPonto.service;
 
 import dev.OsRapazes.BatPonto.dto.TimeEntry.CreateTimeEntryDto;
+import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryReportResponseDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
 import dev.OsRapazes.BatPonto.entity.TimeEntryEntity;
 import dev.OsRapazes.BatPonto.entity.UserEntity;
@@ -10,12 +11,13 @@ import dev.OsRapazes.BatPonto.exception.BusinessException;
 import dev.OsRapazes.BatPonto.repository.TimeEntryRepository;
 import dev.OsRapazes.BatPonto.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,17 +73,63 @@ public class TimeEntryService {
     );
     }
 
-    public List<TimeEntryResponseDto> listEntriesByUserPerPeriod(UUID userId, Instant start, Instant end){
-        List<TimeEntryEntity> entries = timeEntryRepository.findByUser_IdAndEntryAtBetween(userId, start, end);
+    public TimeEntryReportResponseDto getMyReport(String authenticatedEmail, LocalDate from, LocalDate to) {
+        Instant start = from.atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+        Instant end = to.plusDays(1).atStartOfDay(java.time.ZoneOffset.UTC).toInstant(); // exclusivo
 
-        return entries.stream()
-                .map(entity -> new TimeEntryResponseDto(
-                        entity.getId(),
-                        entity.getUser().getId(),
-                        entity.getUser().getName(),
-                        entity.getEntryType().name(),
-                        entity.getEntryAt()
-                ))
-                .collect(Collectors.toList());
+        UserEntity user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
+
+        List<TimeEntryEntity> entries =
+                timeEntryRepository.findByUser_IdAndEntryAtBetweenOrderByEntryAtAsc(
+                        user.getId(), start, end
+                );
+
+
+        return new TimeEntryReportResponseDto(
+                user.getId(),
+                from,
+                to,
+                entries.stream()
+                        .map(e -> new TimeEntryReportResponseDto.EntryItem(
+                                e.getId(),
+                                e.getEntryType().name(),
+                                e.getEntryAt()
+                        ))
+                        .toList()
+        );
     }
+    public TimeEntryReportResponseDto getUserReport(UUID targetUserId, LocalDate from, LocalDate to, String authenticatedEmail) {
+        UserEntity requester = userRepository.findByEmail(authenticatedEmail.toLowerCase())
+                .orElseThrow(() -> BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
+
+        if (requester.getRole() != Role.RH) {
+            throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Apenas RH pode consultar outros usuários.");
+        }
+
+        UserEntity user = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "Usuário não encontrado"));
+
+        Instant start = from.atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+        Instant end = to.plusDays(1).atStartOfDay(java.time.ZoneOffset.UTC).toInstant();
+
+        List<TimeEntryEntity> entries =
+                timeEntryRepository.findByUser_IdAndEntryAtBetweenOrderByEntryAtAsc(
+                        user.getId(), start, end
+                );
+
+        return new TimeEntryReportResponseDto(
+                user.getId(),
+                from,
+                to,
+                entries.stream()
+                        .map(e -> new TimeEntryReportResponseDto.EntryItem(
+                                e.getId(),
+                                e.getEntryType().name(),
+                                e.getEntryAt()
+                        ))
+                        .toList()
+        );
+    }
+
 }
