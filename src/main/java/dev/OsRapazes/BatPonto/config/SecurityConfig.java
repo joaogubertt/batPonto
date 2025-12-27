@@ -4,6 +4,7 @@ import dev.OsRapazes.BatPonto.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,6 +28,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/login").permitAll()
                     .requestMatchers("/api/users").permitAll() // Para DEV (Cadastrar via Postman) - Validar quem pode cadastrar
+                    .requestMatchers(HttpMethod.POST, "/api/time-entries").hasRole("FUNCIONARIO")
+                    .requestMatchers(HttpMethod.GET, "/api/time-entries/my").hasRole("FUNCIONARIO")
+                    .requestMatchers(HttpMethod.GET, "/api/time-entries/user/**").hasRole("RH")
                     .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

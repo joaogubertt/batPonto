@@ -29,6 +29,7 @@ public class TokenService {
             String token = JWT.create()
                     .withIssuer("bat-ponto-api")
                     .withSubject(user.getEmail())
+                    .withClaim("role", user.getRole().name())
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
 

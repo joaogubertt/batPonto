@@ -1,5 +1,7 @@
 package dev.OsRapazes.BatPonto.dto.Auth;
 
+import dev.OsRapazes.BatPonto.entity.enums.Role;
+
 import java.util.UUID;
 
 public record LoginResponseDto(
@@ -8,5 +10,5 @@ public record LoginResponseDto(
         long expiresIn,
         UserSummary user
 ) {
-    public record UserSummary(UUID id, String name, String role) {}
+    public record UserSummary(UUID id, String name, Role role) {}
 }

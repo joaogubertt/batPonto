@@ -33,7 +33,7 @@ public class TimeEntryService {
     }
 
     public List<TimeEntryResponseDto> listEntriesByUserPerPeriod(UUID userId, Instant start, Instant end){
-        List<TimeEntryEntity> entries = timeEntryRepository.findByUserIdAndTimestampBetween(userId, start, end);
+        List<TimeEntryEntity> entries = timeEntryRepository.findByUserIdAndEntryAt(userId, start, end);
 
         return entries.stream()
                 .map(entity -> new TimeEntryResponseDto(
@@ -41,7 +41,7 @@ public class TimeEntryService {
                         entity.getUser().getId(),
                         entity.getUser().getName(),
                         entity.getEntryType(),
-                        entity.getTimestamp()
+                        entity.getEntryAt()
                 ))
                 .collect(Collectors.toList());
     }

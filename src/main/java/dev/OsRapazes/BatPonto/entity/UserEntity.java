@@ -1,5 +1,6 @@
 package dev.OsRapazes.BatPonto.entity;
 
+import dev.OsRapazes.BatPonto.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,8 +35,9 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false)
-    private String role; // -> Transformar em ENUM
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -52,12 +54,13 @@ public class UserEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if ("RH".equalsIgnoreCase(this.role)) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        if (this.role == Role.RH) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_RH"),
+                    new SimpleGrantedAuthority("ROLE_FUNCIONARIO")
+            );
         }
-        else {
-            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        }
+        return List.of(new SimpleGrantedAuthority("ROLE_FUNCIONARIO"));
     }
 
     @Override
