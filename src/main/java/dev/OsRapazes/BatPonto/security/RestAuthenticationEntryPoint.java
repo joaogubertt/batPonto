@@ -1,6 +1,7 @@
 package dev.OsRapazes.BatPonto.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.OsRapazes.BatPonto.exception.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,10 +17,15 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Component
-@RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
+
+    public RestAuthenticationEntryPoint() {
+        mapper = new ObjectMapper();
+        // Registra o módulo JavaTimeModule para lidar com Instant, LocalDateTime etc.
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException ex)
