@@ -1,6 +1,8 @@
 package dev.OsRapazes.BatPonto.config;
 
 import dev.OsRapazes.BatPonto.security.JwtAuthenticationFilter;
+import dev.OsRapazes.BatPonto.security.RestAccessDeniedHandler;
+import dev.OsRapazes.BatPonto.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,21 +21,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final RestAuthenticationEntryPoint entryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
+
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/login").permitAll()
-                    .requestMatchers("/api/users").permitAll() // Para DEV (Cadastrar via Postman) - Validar quem pode cadastrar
-                    .requestMatchers(HttpMethod.POST, "/api/time-entries").hasRole("FUNCIONARIO")
-                    .requestMatchers(HttpMethod.GET, "/api/time-entries/my").hasRole("FUNCIONARIO")
-                    .requestMatchers(HttpMethod.GET, "/api/time-entries/user/**").hasRole("RH")
-                    .anyRequest().authenticated()
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(entryPoint)
+                    .accessDeniedHandler(accessDeniedHandler)
             )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

@@ -1,7 +1,11 @@
 package dev.OsRapazes.BatPonto.exception;
 
-public class ApiErrorResponse extends RuntimeException {
-  public ApiErrorResponse(String message) {
-    super(message);
-  }
-}
+import java.time.Instant;
+
+public record ApiErrorResponse(
+        Instant timestamp,
+        int status,
+        String error,
+        String message,
+        String path
+) {}

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -17,19 +18,19 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/time-entries")
+@RequestMapping("/api/time-entries")
 @RequiredArgsConstructor
 public class TimeEntryController {
 
     public final TimeEntryService timeEntryService;
 
     @PostMapping
-    public ResponseEntity<Void> register(@RequestBody @Valid CreateTimeEntryDto data){
-        timeEntryService.registerEntry(data);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto data){
+        TimeEntryResponseDto response = timeEntryService.registerEntry(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/user/{userId}/filter")
+    @GetMapping("/api/user/{userId}/filter")
     public ResponseEntity<List<TimeEntryResponseDto>> listByUserPerPeriod(
             @PathVariable("userId") UUID userId,
             @RequestParam("from") LocalDate from,

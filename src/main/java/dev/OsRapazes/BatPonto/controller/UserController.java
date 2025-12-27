@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> create(@RequestBody @Valid RegisterUserDto data, UriComponentsBuilder uriBuilder){
         UserResponseDto user = userService.registerUser((data));
 
-        URI uri = uriBuilder.path("/users/{id}").buildAndExpand(user.id()).toUri();
+        URI uri = uriBuilder.path("api/users/{id}").buildAndExpand(user.id()).toUri();
 
         return ResponseEntity.created(uri).body(user);
     }

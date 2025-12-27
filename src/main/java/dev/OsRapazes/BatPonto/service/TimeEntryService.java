@@ -21,7 +21,7 @@ public class TimeEntryService {
     private final TimeEntryRepository timeEntryRepository;
     private final UserRepository userRepository;
 
-    public void registerEntry(CreateTimeEntryDto dto){
+    public TimeEntryResponseDto registerEntry(CreateTimeEntryDto dto){
         UserEntity user = userRepository.findById(dto.userId())
                 .orElseThrow(()-> new RuntimeException("Usuário não encontrado pelo ID: " + dto.userId()));
 
@@ -29,7 +29,15 @@ public class TimeEntryService {
         entry.setUser(user);
         entry.setEntryType(dto.entryType());
 
-        timeEntryRepository.save((entry));
+        TimeEntryEntity saved = timeEntryRepository.save((entry));
+
+        return new TimeEntryResponseDto(
+                saved.getId(),
+                user.getId(),
+                user.getName(),
+                saved.getEntryType(),
+                saved.getEntryAt()
+    );
     }
 
     public List<TimeEntryResponseDto> listEntriesByUserPerPeriod(UUID userId, Instant start, Instant end){

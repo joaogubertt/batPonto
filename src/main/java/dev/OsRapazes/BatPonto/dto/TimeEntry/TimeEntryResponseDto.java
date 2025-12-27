@@ -8,5 +8,5 @@ public record TimeEntryResponseDto(
         UUID userId,
         String userName,
         String entryType,
-        Instant timestamp
+        Instant entryAt
 ) {}
