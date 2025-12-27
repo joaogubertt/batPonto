@@ -14,7 +14,7 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntryEntity, UUID
 
     List<TimeEntryEntity> findByUserId(UUID userId);
 
-    List<TimeEntryEntity> findByUserIdAndEntryAt(UUID userId, Instant start, Instant end);
+    List<TimeEntryEntity> findByUserIdAndEntryAtBetween(UUID userId, Instant start, Instant end);
 
-    Optional<TimeEntryEntity> findTopByUserIdOrderByEntryAt(UUID userId);
+    Optional<TimeEntryEntity> findTopByUserIdOrderByEntryAtDesc(UUID userId);
 }

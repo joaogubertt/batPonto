@@ -33,7 +33,7 @@ public class TimeEntryService {
     }
 
     public List<TimeEntryResponseDto> listEntriesByUserPerPeriod(UUID userId, Instant start, Instant end){
-        List<TimeEntryEntity> entries = timeEntryRepository.findByUserIdAndEntryAt(userId, start, end);
+        List<TimeEntryEntity> entries = timeEntryRepository.findByUserIdAndEntryAtBetween(userId, start, end);
 
         return entries.stream()
                 .map(entity -> new TimeEntryResponseDto(
