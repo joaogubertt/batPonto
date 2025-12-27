@@ -1,7 +1,9 @@
 package dev.OsRapazes.BatPonto.service;
 
+import dev.OsRapazes.BatPonto.entity.UserEntity;
 import dev.OsRapazes.BatPonto.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +16,15 @@ public class AuthorizationService  implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        UserEntity user = userRepository.findByEmail(username)
                 .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado"));
+
+        var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .authorities(authority)
+                .build();
     }
 }
