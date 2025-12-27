@@ -19,8 +19,8 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    @Value("${api.security.token.expiration-micros}")
-    private Long expirationMicros;
+    @Value("${api.security.token.expiration-seconds}")
+    private Long expirationSeconds;
 
     public String generateToken(UserEntity user){
         try {
@@ -52,10 +52,12 @@ public class TokenService {
     }
 
 
+    public long getExpiresInSeconds() {
+        return expirationSeconds != null ? expirationSeconds : 3600;
+    }
+
     private Instant genExpirationDate() {
-        return LocalDateTime.now()
-                .plus(expirationMicros, ChronoUnit.MICROS)
-                .toInstant(ZoneOffset.of("-03:00"));
+        return Instant.now().plus(expirationSeconds, ChronoUnit.SECONDS);
     }
 
 }

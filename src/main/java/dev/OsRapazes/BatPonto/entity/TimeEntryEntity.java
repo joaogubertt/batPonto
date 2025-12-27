@@ -29,12 +29,12 @@ public class TimeEntryEntity {
     private String entryType; // Fazer com Enum tb
 
     @CreationTimestamp
-    @Column(nullable = false)
-    private Instant timestamp;
+    @Column(name = "entry_at", nullable = false)
+    private Instant entryAt;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private Instant created_at;
+    private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
