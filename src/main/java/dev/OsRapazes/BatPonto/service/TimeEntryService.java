@@ -12,10 +12,7 @@ import dev.OsRapazes.BatPonto.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,7 +41,6 @@ public class TimeEntryService {
             );
         }
 
-        //EntryType newType = EntryType.valueOf(dto.entryType().toUpperCase());
         EntryType entryType;
 
         TimeEntryEntity lastEntry = timeEntryRepository
@@ -53,7 +49,22 @@ public class TimeEntryService {
                         startOfDay)
                 .orElse(null);
 
-        System.out.println("lastEntry = " + lastEntry);
+        Instant now = Instant.now();
+
+        if (lastEntry != null) {
+            long minDiffSeconds = 60;
+            long secondsSinceLastEntry = Duration.between(lastEntry.getEntryAt(), now).getSeconds();
+
+            if (secondsSinceLastEntry < minDiffSeconds) {
+                return new TimeEntryResponseDto(
+                        lastEntry.getId(),
+                        user.getId(),
+                        user.getName(),
+                        lastEntry.getEntryType().name(),
+                        lastEntry.getEntryAt()
+                );
+            }
+        }
 
         if (lastEntry != null){
             EntryType lastEntryType = lastEntry.getEntryType();
@@ -66,20 +77,6 @@ public class TimeEntryService {
         } else {
             entryType = EntryType.ENTRADA;
         }
-
-        /*if (lastEntry == null && newType != EntryType.ENTRADA) {
-            throw BusinessException.unprocessable(
-                    "INVALID_FIRST_ENTRY",
-                    "O primeiro registro deve ser ENTRADA"
-            );
-        }
-
-        if (lastEntry != null && lastEntry.getEntryType() == newType) {
-            throw BusinessException.unprocessable(
-                    "INVALID_SEQUENCE",
-                    "Não é permitido registrar " + newType + " duas vezes seguidas"
-            );
-        }*/
 
         TimeEntryEntity entry = new TimeEntryEntity();
         entry.setUser(user);
