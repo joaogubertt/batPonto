@@ -2,6 +2,7 @@ package dev.OsRapazes.BatPonto.controller;
 
 import dev.OsRapazes.BatPonto.dto.TimeEntry.CreateTimeEntryDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
+import dev.OsRapazes.BatPonto.entity.TimeEntryEntity;
 import dev.OsRapazes.BatPonto.service.TimeEntryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,9 +23,9 @@ public class TimeEntryController {
     public final TimeEntryService timeEntryService;
 
     @PostMapping
-    public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto dto){
+    public ResponseEntity<TimeEntryResponseDto> register(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        TimeEntryResponseDto response = timeEntryService.registerEntry(dto, email);
+        TimeEntryResponseDto response = timeEntryService.registerEntry(email);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @GetMapping("/user/{userId}/filter")

@@ -16,7 +16,7 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntryEntity, UUID
 
     List<TimeEntryEntity> findByUser_IdAndEntryAtBetweenOrderByEntryAtAsc(UUID userId, Instant start, Instant end);
 
-    Optional<TimeEntryEntity> findTopByUser_IdOrderByEntryAtDesc(UUID userId);
+    Optional<TimeEntryEntity> findTopByUser_IdAndEntryAtAfterOrderByEntryAtDesc(UUID userId, Instant startOfDay);
 
     List<TimeEntryEntity> findByUser_IdAndEntryAtBetween(UUID userId, Instant entryAtAfter, Instant entryAtBefore);
 }
