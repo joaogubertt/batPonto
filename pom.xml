@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.OsRapazes</groupId>
 	<artifactId>BatPonto</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>BatPonto</name>
 	<description>Projeto de software para controle de RH</description>
 	<url/>
