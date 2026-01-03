@@ -6,6 +6,7 @@ import dev.OsRapazes.BatPonto.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,10 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponseDto> create(@RequestBody @Valid RegisterUserDto data, UriComponentsBuilder uriBuilder){
-        UserResponseDto user = userService.registerUser((data));
+
+        String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        UserResponseDto user = userService.registerUser(data, authenticatedEmail);
 
         URI uri = uriBuilder.path("api/users/{id}").buildAndExpand(user.id()).toUri();
 
