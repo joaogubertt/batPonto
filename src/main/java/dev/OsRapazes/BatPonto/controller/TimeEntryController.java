@@ -10,15 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -58,19 +52,19 @@ public class TimeEntryController {
         return ResponseEntity.ok(timeEntryService.getUserReport(userId, from, to, email));
     }
 
-    @GetMapping("/my/pdf")
+    @GetMapping(value = "/my/pdf", produces = "application/pdf")
     public ResponseEntity<byte[]> myReportPdf(
             @RequestParam("from") LocalDate from,
             @RequestParam("to") LocalDate to
-    ){
+    ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         byte[] pdf = timeEntryPdfService.generateMyReportPdf(email, from, to);
+
         return ResponseEntity.ok()
-                .header("Content-Type", "application/pdf")
                 .header("Content-Disposition", "inline; filename=relatorio-ponto.pdf")
                 .body(pdf);
     }
-    @GetMapping("/user/{userId}/pdf")
+    @GetMapping(value = "/user/{userId}/pdf", produces = "application/pdf")
     public ResponseEntity<byte[]> userReportPdf(
             @PathVariable UUID userId,
             @RequestParam("from") LocalDate from,
@@ -80,8 +74,7 @@ public class TimeEntryController {
         byte[] pdf = timeEntryPdfService.generateUserReportPdf(userId, email, from, to);
 
         return ResponseEntity.ok()
-                .header("Content-Type", "application/pdf")
-                .header("Content-Disposition", "inline; filename=relatorio-ponto-%s.pdf".formatted(userId))
+                .header("Content-Disposition", "inline; filename=relatorio-ponto.pdf" + userId)
                 .body(pdf);
     }
 }
