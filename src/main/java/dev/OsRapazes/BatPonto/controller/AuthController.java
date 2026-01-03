@@ -33,13 +33,14 @@ public class AuthController {
         UserEntity user = userRepository.findByEmail(dto.email().toLowerCase())
                 .orElseThrow(() -> BusinessException.unauthorized(
                         "INVALID_CREDENTIALS",
-                        "Credenciais inválidas"
+                        "Email inválido"
                 ));
 
-        if(!passwordEncoder.matches(dto.password(), user.getPassword())) {
+
+        if(!passwordEncoder.matches(dto.password(), user.getPasswordHash())) {
             throw BusinessException.unauthorized(
                     "INVALID_CREDENTIALS",
-                    "Credenciais inválidas"
+                    "Senha inválida"
             );
         }
         String token = tokenService.generateToken(user);

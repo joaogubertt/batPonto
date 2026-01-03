@@ -30,7 +30,8 @@ public class TimeEntryService {
         UserEntity user = userRepository.findByEmail(authenticatedEmail.toLowerCase())
                 .orElseThrow(() -> BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
 
-        if (user.getRole() != Role.FUNCIONARIO) {
+        // Apenas funcionários e superadmins podem registrar ponto
+        if (user.getRole() != Role.FUNCIONARIO && user.getRole() != Role.SUPERADMIN) {
             throw BusinessException.unprocessable(
                     "ROLE_NOT_ALLOWED",
                     "Somente funcionários podem registrar ponto"
@@ -103,7 +104,8 @@ public class TimeEntryService {
         UserEntity requester = userRepository.findByEmail(authenticatedEmail.toLowerCase())
                 .orElseThrow(() -> BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
 
-        if (requester.getRole() != Role.RH) {
+        // Apenas RH e Superadmin
+        if (requester.getRole() != Role.RH && requester.getRole() != Role.SUPERADMIN) {
             throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Apenas RH pode consultar outros usuários.");
         }
 
