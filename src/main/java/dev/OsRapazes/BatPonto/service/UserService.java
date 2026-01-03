@@ -26,7 +26,8 @@ public class UserService {
         UserEntity requester = userRepository.findByEmail(authenticatedEmail.toLowerCase())
                 .orElseThrow(() ->  BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
 
-        if (requester.getRole() != Role.RH) {
+        // RH e Superadmin podem criar usuários
+        if (requester.getRole() != Role.RH && requester.getRole() != Role.SUPERADMIN) {
             throw new BusinessException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Apenas RH pode criar usuários.");
         }
 

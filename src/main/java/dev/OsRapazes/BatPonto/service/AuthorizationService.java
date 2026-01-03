@@ -23,7 +23,7 @@ public class AuthorizationService  implements UserDetailsService {
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
-                .password(user.getPassword())
+                .password(user.getPasswordHash())
                 .authorities(authority)
                 .build();
     }
