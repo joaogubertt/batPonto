@@ -3,9 +3,11 @@ package dev.OsRapazes.BatPonto.controller;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.CreateTimeEntryDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryReportResponseDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
+import dev.OsRapazes.BatPonto.service.TimeEntryPdfService;
 import dev.OsRapazes.BatPonto.service.TimeEntryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,8 @@ import java.util.UUID;
 public class TimeEntryController {
 
     public final TimeEntryService timeEntryService;
+    @Autowired
+    private TimeEntryPdfService timeEntryPdfService;
 
     @PostMapping
     public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto dto){
@@ -52,5 +56,32 @@ public class TimeEntryController {
     ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(timeEntryService.getUserReport(userId, from, to, email));
+    }
+
+    @GetMapping("/my/pdf")
+    public ResponseEntity<byte[]> myReportPdf(
+            @RequestParam("from") LocalDate from,
+            @RequestParam("to") LocalDate to
+    ){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        byte[] pdf = timeEntryPdfService.generateMyReportPdf(email, from, to);
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/pdf")
+                .header("Content-Disposition", "inline; filename=relatorio-ponto.pdf")
+                .body(pdf);
+    }
+    @GetMapping("/user/{userId}/pdf")
+    public ResponseEntity<byte[]> userReportPdf(
+            @PathVariable UUID userId,
+            @RequestParam("from") LocalDate from,
+            @RequestParam("to") LocalDate to
+    ) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        byte[] pdf = timeEntryPdfService.generateUserReportPdf(userId, email, from, to);
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/pdf")
+                .header("Content-Disposition", "inline; filename=relatorio-ponto-%s.pdf".formatted(userId))
+                .body(pdf);
     }
 }
