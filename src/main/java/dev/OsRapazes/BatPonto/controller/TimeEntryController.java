@@ -4,6 +4,7 @@ import dev.OsRapazes.BatPonto.dto.TimeEntry.CreateTimeEntryDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryReportResponseDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
 import dev.OsRapazes.BatPonto.service.TimeEntryPdfService;
+import dev.OsRapazes.BatPonto.entity.TimeEntryEntity;
 import dev.OsRapazes.BatPonto.service.TimeEntryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+
+import java.time.*;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,9 +29,9 @@ public class TimeEntryController {
     private TimeEntryPdfService timeEntryPdfService;
 
     @PostMapping
-    public ResponseEntity<TimeEntryResponseDto> register(@RequestBody @Valid CreateTimeEntryDto dto){
+    public ResponseEntity<TimeEntryResponseDto> register(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        TimeEntryResponseDto response = timeEntryService.registerEntry(dto, email);
+        TimeEntryResponseDto response = timeEntryService.registerEntry(email);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // GET /api/time-entries/my?from=YYYY-MM-DD&to=YYYY-MM-DD

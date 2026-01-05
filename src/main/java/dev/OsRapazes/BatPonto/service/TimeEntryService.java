@@ -14,10 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,13 @@ public class TimeEntryService {
     private final TimeEntryRepository timeEntryRepository;
     private final UserRepository userRepository;
 
-    public TimeEntryResponseDto registerEntry(CreateTimeEntryDto dto, String authenticatedEmail) {
+    public TimeEntryResponseDto registerEntry(String authenticatedEmail) {
+
+        ZoneId serverZoneId = ZoneId.systemDefault();
+        LocalDate today = LocalDate.now(serverZoneId);
+        ZonedDateTime startOfDayZoned = today.atStartOfDay(serverZoneId);
+        Instant startOfDay = startOfDayZoned.toInstant();
+
         UserEntity user = userRepository.findByEmail(authenticatedEmail.toLowerCase())
                 .orElseThrow(() -> BusinessException.unprocessable("USER_NOT_FOUND", "Usuário autenticado não encontrado"));
 
@@ -38,29 +46,46 @@ public class TimeEntryService {
             );
         }
 
-        EntryType newType = EntryType.valueOf(dto.entryType().toUpperCase());
+        EntryType entryType;
 
         TimeEntryEntity lastEntry = timeEntryRepository
-                .findTopByUser_IdOrderByEntryAtDesc(user.getId())
+                .findTopByUser_IdAndEntryAtAfterOrderByEntryAtDesc(
+                        user.getId(),
+                        startOfDay)
                 .orElse(null);
 
-        if (lastEntry == null && newType != EntryType.ENTRADA) {
-            throw BusinessException.unprocessable(
-                    "INVALID_FIRST_ENTRY",
-                    "O primeiro registro deve ser ENTRADA"
-            );
+        Instant now = Instant.now();
+
+        if (lastEntry != null) {
+            long minDiffSeconds = 60;
+            long secondsSinceLastEntry = Duration.between(lastEntry.getEntryAt(), now).getSeconds();
+
+            if (secondsSinceLastEntry < minDiffSeconds) {
+                return new TimeEntryResponseDto(
+                        lastEntry.getId(),
+                        user.getId(),
+                        user.getName(),
+                        lastEntry.getEntryType().name(),
+                        lastEntry.getEntryAt()
+                );
+            }
         }
 
-        if (lastEntry != null && lastEntry.getEntryType() == newType) {
-            throw BusinessException.unprocessable(
-                    "INVALID_SEQUENCE",
-                    "Não é permitido registrar " + newType + " duas vezes seguidas"
-            );
+        if (lastEntry != null){
+            EntryType lastEntryType = lastEntry.getEntryType();
+            System.out.println(lastEntryType);
+            if(lastEntryType.equals(EntryType.ENTRADA)){
+                entryType = EntryType.SAIDA;
+            } else {
+                entryType = EntryType.ENTRADA;
+            }
+        } else {
+            entryType = EntryType.ENTRADA;
         }
 
         TimeEntryEntity entry = new TimeEntryEntity();
         entry.setUser(user);
-        entry.setEntryType(newType);
+        entry.setEntryType(entryType);
         entry.setEntryAt(Instant.now());
 
         TimeEntryEntity saved = timeEntryRepository.save((entry));
@@ -133,5 +158,4 @@ public class TimeEntryService {
                         .toList()
         );
     }
-
 }
