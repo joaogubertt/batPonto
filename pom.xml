@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.OsRapazes</groupId>
 	<artifactId>BatPonto</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>BatPonto</name>
 	<description>Projeto de software para controle de RH</description>
 	<url/>
@@ -80,6 +80,11 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.20.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.openhtmltopdf</groupId>
+			<artifactId>openhtmltopdf-pdfbox</artifactId>
+			<version>1.0.10</version>
 		</dependency>
 
 	</dependencies>

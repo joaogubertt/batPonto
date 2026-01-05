@@ -1,0 +1,7 @@
+FROM flyway/flyway:11
+
+# migrations
+COPY src/db/migration /flyway/sql
+
+ENTRYPOINT ["flyway"]
+CMD ["-connectRetries=60", "migrate"]
