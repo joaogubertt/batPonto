@@ -9,7 +9,9 @@ import dev.OsRapazes.BatPonto.service.TimeEntryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +67,8 @@ public class TimeEntryController {
         byte[] pdf = timeEntryPdfService.generateMyReportPdf(email, from, to);
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", "inline; filename=relatorio-ponto.pdf")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=meu-relatorio-ponto.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
     @GetMapping(value = "/user/{userId}/pdf", produces = "application/pdf")
@@ -78,7 +81,8 @@ public class TimeEntryController {
         byte[] pdf = timeEntryPdfService.generateUserReportPdf(userId, email, from, to);
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", "inline; filename=relatorio-ponto.pdf" + userId)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=relatorio-ponto.pdf" + userId)
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
 }
