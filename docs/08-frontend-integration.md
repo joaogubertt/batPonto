@@ -187,3 +187,5 @@ Recomendação no frontend:
 - [ ] Relatórios JSON retornam 200
 - [ ] Relatórios PDF retornam `application/pdf`
 - [ ] Header `Content-Disposition` está presente e exposto via CORS (se necessário)
+
+---
