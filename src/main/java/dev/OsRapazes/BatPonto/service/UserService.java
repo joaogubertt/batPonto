@@ -7,6 +7,8 @@ import dev.OsRapazes.BatPonto.entity.enums.Role;
 import dev.OsRapazes.BatPonto.exception.BusinessException;
 import dev.OsRapazes.BatPonto.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -52,6 +54,20 @@ public class UserService {
                 savedUser.getEmail(),
                 savedUser.getRole()
         );
+    }
+
+    public List<UserResponseDto> findAllFuncionarios() {
+
+        List<UserEntity> funcionarios = userRepository.findByRole(Role.FUNCIONARIO);
+
+        return funcionarios.stream()
+                .map(user -> new UserResponseDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole()
+                ))
+                .toList();
     }
 
     public UserEntity findById(UUID id) {
