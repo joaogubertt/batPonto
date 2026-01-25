@@ -2,6 +2,7 @@ package dev.OsRapazes.BatPonto.controller;
 
 import dev.OsRapazes.BatPonto.dto.TimeEntry.CreateTimeEntryDto;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryReportResponseDto;
+import org.springframework.format.annotation.DateTimeFormat;
 import dev.OsRapazes.BatPonto.dto.TimeEntry.TimeEntryResponseDto;
 import dev.OsRapazes.BatPonto.service.TimeEntryPdfService;
 import dev.OsRapazes.BatPonto.entity.TimeEntryEntity;
@@ -50,9 +51,9 @@ public class TimeEntryController {
     // GET /api/time-entries/user/{userId}?from=YYYY-MM-DD&to=YYYY-MM-DD
     @GetMapping("/user/{userId}")
     public ResponseEntity<TimeEntryReportResponseDto> userReport(
-            @PathVariable UUID userId,
-            @RequestParam("from") LocalDate from,
-            @RequestParam("to") LocalDate to
+            @PathVariable("userId") UUID userId,
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(timeEntryService.getUserReport(userId, from, to, email));
@@ -71,9 +72,10 @@ public class TimeEntryController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
     @GetMapping(value = "/user/{userId}/pdf", produces = "application/pdf")
     public ResponseEntity<byte[]> userReportPdf(
-            @PathVariable UUID userId,
+            @PathVariable("userId") UUID userId,
             @RequestParam("from") LocalDate from,
             @RequestParam("to") LocalDate to
     ) {
